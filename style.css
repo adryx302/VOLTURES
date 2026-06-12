@@ -1,4 +1,6 @@
-/* RESET GENERALE */
+/* ==========================================
+   RESET GENERALE & VARIABILI
+   ========================================== */
 * {
     margin: 0;
     padding: 0;
@@ -26,7 +28,13 @@ body {
     color: #c5a059; /* Colore Oro Primario */
 }
 
-/* NAVBAR PROFESSIONALE */
+.text-center {
+    text-align: center;
+}
+
+/* ==========================================
+   NAVBAR PROFESSIONALE
+   ========================================== */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -98,7 +106,9 @@ body {
     transform: translateY(-2px);
 }
 
-/* HERO SECTION ACCATTIVANTE */
+/* ==========================================
+   HERO SECTION
+   ========================================== */
 .hero {
     background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(11, 12, 16, 1)), url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600') no-repeat center center/cover;
     height: 70vh;
@@ -153,7 +163,9 @@ body {
     box-shadow: 0 6px 20px rgba(197, 160, 89, 0.6);
 }
 
-/* CARDS DELLE SEZIONI */
+/* ==========================================
+   CARDS DELLE SEZIONI
+   ========================================== */
 .section-card {
     background-color: #1f2833;
     border: 1px solid #2f3b4c;
@@ -172,7 +184,9 @@ body {
     letter-spacing: 1px;
 }
 
-/* ORGANIGRAMMA */
+/* ==========================================
+   ORGANIGRAMMA
+   ========================================== */
 .grid-ranks {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -204,7 +218,9 @@ body {
     color: #959799;
 }
 
-/* CANALE RADIO */
+/* ==========================================
+   CANALE RADIO
+   ========================================== */
 .radio-box {
     background-color: #0b0c10;
     padding: 2rem;
@@ -231,17 +247,13 @@ body {
     color: #959799;
 }
 
-/* ZONE OPERATIVE */
+/* ==========================================
+   ZONE OPERATIVE
+   ========================================== */
 .grid-zones {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-}
-
-@media(max-width: 768px) {
-    .grid-zones { grid-template-columns: 1fr; }
-    .navbar { flex-direction: column; gap: 15px; text-align: center; }
-    .nav-links { flex-wrap: wrap; justify-content: center; }
 }
 
 .zone-card {
@@ -267,16 +279,14 @@ body {
     color: #959799;
 }
 
-/* CONTATORI INTERATTIVI MODIFICABILI */
+/* ==========================================
+   CONTATORI INTERATTIVI
+   ========================================== */
 .grid-counters {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     margin-top: 2rem;
-}
-
-@media(max-width: 600px) {
-    .grid-counters { grid-template-columns: 1fr; }
 }
 
 .counter-box {
@@ -328,7 +338,143 @@ body {
     color: #959799;
 }
 
-/* FOOTER */
+/* ==========================================
+   SEZIONE BACKOFFICE & LOGIN ADMIN (NUOVA)
+   ========================================== */
+.admin-login-section {
+    background-color: #11141a;
+    border: 1px solid #2f3b4c;
+    border-top: 3px solid #c5a059;
+    padding: 2.5rem;
+    border-radius: 6px;
+    text-align: center;
+    margin-top: 4rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+
+.admin-input {
+    padding: 0.8rem 1.2rem;
+    background: #0b0c10;
+    border: 1px solid #2f3b4c;
+    color: #fff;
+    border-radius: 4px;
+    margin: 10px;
+    width: 100%;
+    max-width: 300px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.3s;
+}
+
+.admin-input:focus {
+    outline: none;
+    border-color: #c5a059;
+}
+
+.btn-admin {
+    padding: 0.8rem 1.5rem;
+    background-color: #c5a059;
+    border: none;
+    color: #111;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-admin:hover {
+    background-color: #fff;
+    color: #111;
+    transform: translateY(-2px);
+}
+
+/* ==========================================
+   EFFETTI LIVE EDITING IN MODALITÀ ADMIN
+   ========================================== */
+.editable-active {
+    border: 1px dashed #c5a059 !important;
+    background-color: rgba(197, 160, 89, 0.08) !important;
+    padding: 4px 8px !important;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.editable-active:focus {
+    outline: none;
+    background-color: rgba(197, 160, 89, 0.15) !important;
+    border-style: solid;
+}
+
+.admin-badge {
+    display: none;
+    background-color: #8b0000;
+    color: #fff;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    position: fixed;
+    top: 90px; /* Posizionato subito sotto la navbar */
+    left: 20px;
+    z-index: 999;
+    font-family: 'Orbitron', sans-serif;
+    border: 1px solid #c5a059;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+}
+
+/* ==========================================
+   MEDIA QUERIES (RESPONSIVE)
+   ========================================== */
+@media(max-width: 768px) {
+    .navbar { 
+        flex-direction: column; 
+        gap: 15px; 
+        text-align: center; 
+        padding: 1rem;
+    }
+    
+    .nav-links { 
+        flex-wrap: wrap; 
+        justify-content: center; 
+    }
+    
+    .hero {
+        margin-top: 140px;
+        height: auto;
+        padding: 4rem 1rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .grid-zones { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .admin-badge {
+        top: auto;
+        bottom: 20px;
+        left: 20px;
+    }
+}
+
+@media(max-width: 600px) {
+    .grid-counters { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .section-card {
+        padding: 1.5rem;
+    }
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
 footer {
     background-color: #050508;
     text-align: center;
