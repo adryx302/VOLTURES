@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <div id="admin-badge" class="admin-badge">MODALITÀ EDITOR ATTIVA</div>
+    <div id="admin-badge" class="admin-badge" style="display: none;">MODALITÀ EDITOR ATTIVA</div>
 
     <nav class="navbar">
         <div class="nav-logo">
@@ -62,7 +62,7 @@
                     <p class="rank-name" id="txt-rank-soldati">Soldati / Operativi</p>
                 </div>
             </div>
-            <div class="admin-control-zone">
+            <div class="admin-control-zone" style="display: none;">
                 <button class="btn-admin-add" onclick="aggiungiCardRank()">+ Aggiungi Grado / Ruolo</button>
             </div>
         </section>
@@ -89,7 +89,7 @@
                     <p class="zone-desc" id="txt-zona2-desc">Raffineria principale. Accesso consentito solo se autorizzati dai superiori in radio.</p>
                 </div>
             </div>
-            <div class="admin-control-zone">
+            <div class="admin-control-zone" style="display: none;">
                 <button class="btn-admin-add" onclick="aggiungiCardZona()">+ Aggiungi Nuova Zona</button>
             </div>
         </section>
@@ -159,11 +159,11 @@
         const PASSWORD_ADMIN = "vultures2026"; 
 
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Carica i contatori magazzino
+            // 1. Carica i contatori magazzino (Sempre utilizzabili da chiunque)
             if(localStorage.getItem("raccolto")) document.getElementById("valore-raccolto").innerText = localStorage.getItem("raccolto");
             if(localStorage.getItem("processato")) document.getElementById("valore-processato").innerText = localStorage.getItem("processato");
 
-            // 2. Ripristina lo stato strutturale salvato delle macro-aree modificate (Grandi Grids e Sezioni Custom)
+            // 2. Ripristina lo stato strutturale salvato delle macro-aree
             if(localStorage.getItem("html-grid-ranks")) {
                 document.getElementById("dynamic-grid-ranks").innerHTML = localStorage.getItem("html-grid-ranks");
             }
@@ -177,7 +177,7 @@
                 document.getElementById("nav-links-container").innerHTML = localStorage.getItem("html-nav-links");
             }
 
-            // 3. Ripristina i testi editabili standard singoli
+            // 3. Ripristina i singoli testi statici salvati
             const campiModificabili = document.querySelectorAll("[id^='txt-']");
             campiModificabili.forEach(el => {
                 let testoSalvato = localStorage.getItem(el.id);
@@ -186,9 +186,14 @@
                 }
             });
 
-            // 4. Se la sessione admin è già attiva, sblocca i controlli
+            // 4. Forza la chiusura ed il blocco dell'editor a livello globale per gli utenti non autenticati
+            disattivaContentEditableSuTutti();
+
+            // 5. Se la sessione admin è già attiva, sblocca i controlli
             if(sessionStorage.getItem("isAdmin") === "true") {
                 mostraInterfacciaAdmin();
+            } else {
+                nascondiInterfacciaAdmin();
             }
         });
 
@@ -219,19 +224,44 @@
             document.getElementById("admin-actions-wrapper").style.display = "block";
             document.getElementById("admin-badge").style.display = "block";
 
-            // Mostra i pulsanti per aggiungere righe/card
+            // Mostra le zone dei pulsanti "+ Aggiungi"
             document.querySelectorAll(".admin-control-zone").forEach(zone => zone.style.display = "block");
+            
+            // Mostra i bottoni di eliminazione "X" e "Elimina Intera Sezione"
+            document.querySelectorAll(".btn-delete-card, .btn-delete-section").forEach(btn => btn.style.display = "inline-block");
 
-            // Rendi attivi tutti i tag di testo modificabili presenti
+            // Rendi attivi tutti i tag di testo modificabili
             attivaContentEditableSuTutti();
         }
 
+        function nascondiInterfacciaAdmin() {
+            document.getElementById("login-form-wrapper").style.display = "block";
+            document.getElementById("admin-actions-wrapper").style.display = "none";
+            document.getElementById("admin-badge").style.display = "none";
+
+            // Nasconde i pulsanti "+ Aggiungi"
+            document.querySelectorAll(".admin-control-zone").forEach(zone => zone.style.display = "none");
+            
+            // Nasconde i bottoni di eliminazione "X" e "Elimina Intera Sezione"
+            document.querySelectorAll(".btn-delete-card, .btn-delete-section").forEach(btn => btn.style.display = "none");
+
+            // Disattiva la scrittura
+            disattivaContentEditableSuTutti();
+        }
+
         function attivaContentEditableSuTutti() {
-            // Seleziona tutti gli elementi di testo dinamici o interni alle card
             const elementi = document.querySelectorAll("[id^='txt-'], .rank-card h3, .rank-name, .zone-card h4, .zone-card p, .custom-section-content");
             elementi.forEach(el => {
                 el.setAttribute("contenteditable", "true");
                 el.classList.add("editable-active");
+            });
+        }
+
+        function disattivaContentEditableSuTutti() {
+            const elementi = document.querySelectorAll("[id^='txt-'], .rank-card h3, .rank-name, .zone-card h4, .zone-card p, .custom-section-content");
+            elementi.forEach(el => {
+                el.removeAttribute("contenteditable");
+                el.classList.remove("editable-active");
             });
         }
 
@@ -301,9 +331,7 @@
 
         function rimuoviSezioneCompleta(sectionId, bottone) {
             if(confirm("Sei sicuro di voler eliminare definitivamente questa sezione e la sua voce nel menu?")) {
-                // Rimuove la sezione
                 bottone.parentElement.remove();
-                // Rimuove il link corrispondente nella navbar
                 let linkNav = document.querySelector(`.nav-links a[href="#${sectionId}"]`);
                 if(linkNav) linkNav.parentElement.remove();
             }
@@ -311,13 +339,17 @@
 
         // GESTIONE DEL SALVATAGGIO GENERALE
         function salvaTutto() {
+            // Disattiviamo temporaneamente i permessi di scrittura prima del salvataggio
+            // In questo modo nell'HTML del LocalStorage non verranno salvati i tag di editing attivi
+            disattivaContentEditableSuTutti();
+
             // 1. Salva i testi singoli standard statici
             const campiModificabili = document.querySelectorAll("[id^='txt-']");
             campiModificabili.forEach(el => {
                 localStorage.setItem(el.id, el.innerHTML);
             });
 
-            // 2. Salva l'intera struttura interna dei moduli in cui l'admin può aggiungere/rimuovere nodi
+            // 2. Salva l'intera struttura interna dei moduli pulita
             let htmlRanks = document.getElementById("dynamic-grid-ranks").innerHTML;
             let htmlZones = document.getElementById("dynamic-grid-zones").innerHTML;
             let htmlCustomSections = document.getElementById("custom-sections-container").innerHTML;
@@ -328,7 +360,10 @@
             localStorage.setItem("html-custom-sections", htmlCustomSections);
             localStorage.setItem("html-nav-links", htmlNavLinks);
 
-            alert("Sito Aggiornato! Tutte le nuove righe, sezioni e testi modificati sono stati salvati nella memoria locale.");
+            // Ripristiniamo immediatamente i permessi per l'admin dato che è loggato
+            attivaContentEditableSuTutti();
+
+            alert("Sito Aggiornato! Tutte le nuove righe, sezioni e testi modificati sono stati salvati in modo sicuro.");
         }
 
         function logoutAdmin() {
