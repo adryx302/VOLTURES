@@ -111,9 +111,11 @@
             <div id="dynamic-warehouse-logs" class="warehouse-logs-container">
                 </div>
 
-            <div class="user-control-zone" id="warehouse-actions" style="display: none; margin-top: 20px; text-align: center; gap: 15px;">
-                <button class="btn-warehouse-add btn-harvest" onclick="aggiungiLogMagazzino('raccolto')">📦 + Nuovo Blocco Raccolto</button>
-                <button class="btn-warehouse-add btn-process" onclick="aggiungiLogMagazzino('processo')">🔥 + Nuovo Blocco Processo</button>
+            <div class="user-control-zone" id="warehouse-actions" style="display: none; margin-top: 20px; text-align: center; gap: 15px; flex-direction: column; align-items: center;">
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn-warehouse-add btn-harvest" onclick="aggiungiLogMagazzino('raccolto')">📦 + Nuovo Blocco Raccolto</button>
+                    <button class="btn-warehouse-add btn-process" onclick="aggiungiLogMagazzino('processo')">🔥 + Nuovo Blocco Processo</button>
+                </div>
                 <div style="margin-top: 15px;">
                     <button onclick="salvaTutto()" class="btn-admin" style="background-color: #28a745; color: white;">💾 SALVA REGISTRO MAGAZZINO</button>
                 </div>
@@ -156,7 +158,6 @@
         const PWD_USER = "vultures";
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Ripristina lo stato strutturale dalle memorie locali
             if(localStorage.getItem("html-grid-ranks")) document.getElementById("dynamic-grid-ranks").innerHTML = localStorage.getItem("html-grid-ranks");
             if(localStorage.getItem("html-grid-radio")) document.getElementById("dynamic-grid-radio").innerHTML = localStorage.getItem("html-grid-radio");
             if(localStorage.getItem("html-grid-zones")) document.getElementById("dynamic-grid-zones").innerHTML = localStorage.getItem("html-grid-zones");
@@ -164,14 +165,12 @@
             if(localStorage.getItem("html-nav-links")) document.getElementById("nav-links-container").innerHTML = localStorage.getItem("html-nav-links");
             if(localStorage.getItem("html-warehouse-logs")) document.getElementById("dynamic-warehouse-logs").innerHTML = localStorage.getItem("html-warehouse-logs");
 
-            // Ripristina i singoli testi statici
             const campiModificabili = document.querySelectorAll("[id^='txt-']");
             campiModificabili.forEach(el => {
                 let testoSalvato = localStorage.getItem(el.id);
                 if(testoSalvato) el.innerHTML = testoSalvato;
             });
 
-            // Gestione dei permessi di sessione corrente
             let sessioneAttiva = sessionStorage.getItem("ruoloFazione");
             if(sessioneAttiva === "admin") {
                 mostraInterfacciaAdmin();
@@ -183,18 +182,17 @@
             }
         });
 
-        // AUTENTICAZIONE UNIFICATA
         function attivaLoginGenerale() {
             let pass = document.getElementById("admin-password").value;
             if(pass === PWD_ADMIN) {
                 sessionStorage.setItem("ruoloFazione", "admin");
                 mostraInterfacciaAdmin();
                 mostraInterfacciaUser();
-                alert("Accesso AMMINISTRATORE Eseguito! Modifiche globali attive.");
+                alert("Accesso AMMINISTRATORE Eseguito! Controllo totale attivo.");
             } else if(pass === PWD_USER) {
                 sessionStorage.setItem("ruoloFazione", "user");
                 mostraInterfacciaUser();
-                alert("Accesso UTENTE Eseguito! Gestione magazzino sbloccata.");
+                alert("Accesso UTENTE Eseguito! Registro magazzino sbloccato.");
             } else {
                 alert("Password errata.");
             }
@@ -203,18 +201,16 @@
         function mostraInterfacciaUser() {
             document.getElementById("login-form-wrapper").style.display = "none";
             document.getElementById("admin-actions-wrapper").style.display = "block";
-            document.getElementById("session-type-label").innerText = sessionStorage.getItem("ruoloFazione") === "admin" ? "Capo (Admin)" : "Membro (User)";
             
-            // Sblocca Magazzino
+            let ruolo = sessionStorage.getItem("ruoloFazione");
+            document.getElementById("session-type-label").innerText = ruolo === "admin" ? "Capo (Admin)" : "Membro (User)";
+            
+            // Sblocca visivamente il magazzino
             document.getElementById("magazzino-locked-msg").style.display = "none";
             document.getElementById("warehouse-actions").style.display = "flex";
             
-            // Rende editabili i campi del magazzino
-            document.querySelectorAll(".warehouse-log-card span, .warehouse-log-card strong").forEach(el => {
-                el.setAttribute("contenteditable", "true");
-                el.classList.add("editable-active");
-            });
-            document.querySelectorAll(".warehouse-log-card .btn-delete-card").forEach(btn => btn.style.display = "inline-block");
+            // Rende editabili in scrittura tutti i campi interni del magazzino
+            aggiornaStatoCampiMagazzino(true);
         }
 
         function mostraInterfacciaAdmin() {
@@ -223,7 +219,6 @@
             document.querySelectorAll(".admin-control-zone").forEach(zone => zone.style.display = "block");
             document.querySelectorAll("#dynamic-grid-ranks .btn-delete-card, #dynamic-grid-radio .btn-delete-card, #dynamic-grid-zones .btn-delete-card, .btn-delete-section").forEach(btn => btn.style.display = "inline-block");
             
-            // Attiva contenteditable generale
             const elementi = document.querySelectorAll("[id^='txt-'], .rank-card h3, .rank-name, .zone-card h4, .zone-card p, .custom-section-content, .radio-frequency, .radio-note");
             elementi.forEach(el => {
                 el.setAttribute("contenteditable", "true");
@@ -243,9 +238,25 @@
                 el.removeAttribute("contenteditable");
                 el.classList.remove("editable-active");
             });
+            aggiornaStatoCampiMagazzino(false);
         }
 
-        // AGGIUNTA BLOCCHI MAGAZZINO DINAMICI
+        function aggiornaStatoCampiMagazzino(attivo) {
+            const selettori = "#dynamic-warehouse-logs span, #dynamic-warehouse-logs strong, #dynamic-warehouse-logs h4";
+            document.querySelectorAll(selettori).forEach(el => {
+                if(attivo) {
+                    el.setAttribute("contenteditable", "true");
+                    el.classList.add("editable-active");
+                } else {
+                    el.removeAttribute("contenteditable");
+                    el.classList.remove("editable-active");
+                }
+            });
+            document.querySelectorAll("#dynamic-warehouse-logs .btn-delete-card").forEach(btn => {
+                btn.style.display = attivo ? "inline-block" : "none";
+            });
+        }
+
         function aggiungiLogMagazzino(tipo) {
             let container = document.getElementById("dynamic-warehouse-logs");
             let oggi = new Date().toLocaleDateString('it-IT');
@@ -255,10 +266,10 @@
                 htmlBlocco = `
                     <div class="warehouse-log-card harvest-theme" style="position:relative;">
                         <h4>🟢 Attività: RACCOLTO MATERIALE</h4>
-                        <p><strong>Quantità:</strong> <span class="editable-active" contenteditable="true">0 unità</span></p>
+                        <p><strong>Raccolto:</strong> <span class="editable-active" contenteditable="true">0 unità</span></p>
                         <p><strong>Svolto da:</strong> <span class="editable-active" contenteditable="true">Nome Operatore</span></p>
                         <p><strong>Data:</strong> <span class="editable-active" contenteditable="true">${oggi}</span></p>
-                        <button class="btn-delete-card" onclick="this.parentElement.remove()">X</button>
+                        <button class="btn-delete-card" onclick="this.parentElement.remove()" style="display: inline-block;">X</button>
                     </div>
                 `;
             } else if(tipo === 'processo') {
@@ -268,14 +279,14 @@
                         <p><strong>Processato:</strong> <span class="editable-active" contenteditable="true">0 unità</span></p>
                         <p><strong>Svolto da:</strong> <span class="editable-active" contenteditable="true">Nome Operatore</span></p>
                         <p><strong>Data:</strong> <span class="editable-active" contenteditable="true">${oggi}</span></p>
-                        <button class="btn-delete-card" onclick="this.parentElement.remove()">X</button>
+                        <button class="btn-delete-card" onclick="this.parentElement.remove()" style="display: inline-block;">X</button>
                     </div>
                 `;
             }
-            container.insertAdjacentHTML('afterbegin', htmlBlocco); // Inserisce in alto come ultimo log
+            container.insertAdjacentHTML('afterbegin', htmlBlocco);
+            aggiornaStatoCampiMagazzino(true);
         }
 
-        // AGGIUNTA COMPONENTI ADMIN (Ranks, Radio, Zone)
         function aggiungiCardRank() {
             let grid = document.getElementById("dynamic-grid-ranks");
             let nuovaCard = `<div class="rank-card member" style="position:relative;"><h3>Nuovo Ruolo</h3><p class="rank-name" contenteditable="true">Modifica Nome</p><button class="btn-delete-card" onclick="this.parentElement.remove()">X</button></div>`;
@@ -313,18 +324,15 @@
             mostraInterfacciaAdmin();
         }
 
-        // SALVATAGGIO GLOBALE PONDERATO
         function salvaTutto() {
-            // Rimuove temporaneamente le cornici grafiche di editing per pulire l'HTML prima del salvataggio
             document.querySelectorAll("[contenteditable]").forEach(el => {
                 el.removeAttribute("contenteditable");
                 el.classList.remove("editable-active");
             });
+            aggiornaStatoCampiMagazzino(false);
 
-            // 1. Salva testi statici
             document.querySelectorAll("[id^='txt-']").forEach(el => localStorage.setItem(el.id, el.innerHTML));
 
-            // 2. Salva macro-strutture strutturali
             localStorage.setItem("html-grid-ranks", document.getElementById("dynamic-grid-ranks").innerHTML);
             localStorage.setItem("html-grid-radio", document.getElementById("dynamic-grid-radio").innerHTML);
             localStorage.setItem("html-grid-zones", document.getElementById("dynamic-grid-zones").innerHTML);
@@ -332,9 +340,13 @@
             localStorage.setItem("html-nav-links", document.getElementById("nav-links-container").innerHTML);
             localStorage.setItem("html-warehouse-logs", document.getElementById("dynamic-warehouse-logs").innerHTML);
 
-            // Ripristina l'interfaccia corretta in base al login corrente
-            if(sessionStorage.getItem("ruoloFazione") === "admin") { mostraInterfacciaAdmin(); mostraInterfacciaUser(); }
-            else if(sessionStorage.getItem("ruoloFazione") === "user") { mostraInterfacciaUser(); }
+            let ruolo = sessionStorage.getItem("ruoloFazione");
+            if(ruolo === "admin") { 
+                mostraInterfacciaAdmin(); 
+                mostraInterfacciaUser(); 
+            } else if(ruolo === "user") { 
+                mostraInterfacciaUser(); 
+            }
 
             alert("💾 Database di Fazione e Registro Magazzino Aggiornati con Successo!");
         }
