@@ -39,44 +39,38 @@
 
         <section id="info" class="section-card">
             <h2><span class="gold-text">//</span> INFORMAZIONI</h2>
-            <p id="txt-info-p">I <strong>VOLTURES</strong> sono un'organizzazione gerarchica e disciplinata che punta al controllo strategico delle risorse e del territorio. Non siamo solo una fazione, siamo una famiglia legata da un codice d'onore ferreo.</p>
+            <p id="txt-info-p">I <strong>VULTURES</strong> sono un'organizzazione gerarchica e disciplinata che punta al controllo strategico delle risorse e del territorio. Non siamo solo una fazione, siamo una famiglia legata da un codice d'onore ferreo.</p>
         </section>
 
         <section id="organigramma" class="section-card">
             <h2><span class="gold-text">//</span> ORGANIGRAMMA FAZIONE</h2>
             <div class="grid-ranks" id="dynamic-grid-ranks">
-                <!-- Creatore -->
                 <div class="rank-card creator">
                     <h3>Creatore</h3>
                     <p class="rank-name txt-rank-creator">Boss / Leader</p>
                 </div>
                 
-                <!-- Capo Fazione -->
                 <div class="rank-card boss">
                     <h3>Capo Fazione</h3>
                     <p class="rank-name txt-rank-boss">Boss / Leader</p>
                 </div>
                 
-                <!-- Sotto Capo -->
                 <div class="rank-card underboss">
                     <h3>Sotto Capo</h3>
                     <p class="rank-name txt-rank-underboss">Underboss</p>
                 </div>
                 
-                <!-- Consigliere / Gestore -->
                 <div class="rank-card manager">
                     <h3>Consigliere / Gestore</h3>
                     <p class="rank-name txt-rank-consigliere">Consigliere</p>
                 </div>
                 
-                <!-- Membri Effettivi -->
                 <div class="rank-card member">
                     <h3>Membri Effettivi</h3>
                     <p class="rank-name txt-rank-soldati">Soldati / Operativi</p>
                 </div>
             </div>
             
-            <!-- Zona Controllo Admin -->
             <div class="admin-control-zone" style="display: none;">
                 <button class="btn-admin-add" onclick="aggiungiCardRank()">+ Aggiungi Grado / Ruolo</button>
             </div>
@@ -123,8 +117,7 @@
                 🔒 Inserisci la password USER corretta a fondo pagina per sbloccare e modificare i log di magazzino.
             </div>
 
-            <div id="dynamic-warehouse-logs" class="warehouse-logs-container">
-                </div>
+            <div id="dynamic-warehouse-logs" class="warehouse-logs-container"></div>
 
             <div class="user-control-zone" id="warehouse-actions" style="display: none; margin-top: 20px; text-align: center; gap: 15px; flex-direction: column; align-items: center;">
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
@@ -165,7 +158,7 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 VOLTURES RP. Tutti i diritti riservati. Sviluppato per fini di Roleplay.</p>
+        <p>&copy; 2026 VULTURES RP. Tutti i diritti riservati. Sviluppato per fini di Roleplay.</p>
     </footer>
 
     <script>
@@ -220,11 +213,9 @@
             let ruolo = sessionStorage.getItem("ruoloFazione");
             document.getElementById("session-type-label").innerText = ruolo === "admin" ? "Capo (Admin)" : "Membro (User)";
             
-            // Sblocca visivamente il magazzino
             document.getElementById("magazzino-locked-msg").style.display = "none";
             document.getElementById("warehouse-actions").style.display = "flex";
             
-            // Rende editabili in scrittura tutti i campi interni del magazzino
             aggiornaStatoCampiMagazzino(true);
         }
 
@@ -304,21 +295,37 @@
 
         function aggiungiCardRank() {
             let grid = document.getElementById("dynamic-grid-ranks");
-            let nuovaCard = `<div class="rank-card member" style="position:relative;"><h3>Nuovo Ruolo</h3><p class="rank-name" contenteditable="true">Modifica Nome</p><button class="btn-delete-card" onclick="this.parentElement.remove()">X</button></div>`;
+            let nuovaCard = `
+                <div class="rank-card member" style="position:relative;">
+                    <h3>Nuovo Ruolo</h3>
+                    <p class="rank-name" contenteditable="true">Modifica Nome</p>
+                    <button class="btn-delete-card" onclick="this.parentElement.remove()" style="display: inline-block;">X</button>
+                </div>`;
             grid.insertAdjacentHTML('beforeend', nuovaCard);
             mostraInterfacciaAdmin();
         }
 
         function aggiungiCardRadio() {
             let grid = document.getElementById("dynamic-grid-radio");
-            let nuovaCard = `<div class="radio-box" style="position:relative; width: 100%;"><p class="radio-frequency">Frequenza: <span class="glow-text" contenteditable="true">00.0 MHz</span></p><p class="radio-note" contenteditable="true">Nota: Configura indicazioni.</p><button class="btn-delete-card" onclick="this.parentElement.remove()">X</button></div>`;
+            let nuovaCard = `
+                <div class="radio-box" style="position:relative; width: 100%;">
+                    <p class="radio-frequency">Frequenza: <span class="glow-text" contenteditable="true">00.0 MHz</span></p>
+                    <p class="radio-note" contenteditable="true">Nota: Configura indicazioni.</p>
+                    <button class="btn-delete-card" onclick="this.parentElement.remove()" style="display: inline-block;">X</button>
+                </div>`;
             grid.insertAdjacentHTML('beforeend', nuovaCard);
             mostraInterfacciaAdmin();
         }
 
         function aggiungiCardZona() {
             let grid = document.getElementById("dynamic-grid-zones");
-            let nuovaCard = `<div class="zone-card" style="position:relative;"><h4>Nuovo Punto</h4><p contenteditable="true"><strong>Posizione:</strong> Inserisci Coordinate</p><p class="zone-desc" contenteditable="true">Descrizione compiti.</p><button class="btn-delete-card" onclick="this.parentElement.remove()">X</button></div>`;
+            let nuovaCard = `
+                <div class="zone-card" style="position:relative;">
+                    <h4>Nuovo Punto</h4>
+                    <p contenteditable="true"><strong>Posizione:</strong> Inserisci Coordinate</p>
+                    <p class="zone-desc" contenteditable="true">Descrizione compiti.</p>
+                    <button class="btn-delete-card" onclick="this.parentElement.remove()" style="display: inline-block;">X</button>
+                </div>`;
             grid.insertAdjacentHTML('beforeend', nuovaCard);
             mostraInterfacciaAdmin();
         }
